@@ -6,13 +6,21 @@ MAINTAINER Anestis Georgiadis <mranest@gmail.com>
 # Define WILDFLY_VERSION
 ENV WILDFLY_VERSION 9.0.2.Final
 
+# Ensure signals are forwarded to the JVM process correctly for graceful shutdown
+ENV LAUNCH_JBOSS_IN_BACKGROUND true
+
 # Install WildFly
 RUN \
   mkdir -p /data && \
-  wget -O - http://download.jboss.org/wildfly/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz | tar zx -C /data
+  wget -O - http://download.jboss.org/wildfly/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz | tar zx -C /data && \
+  mv /data/wildfly-$WILDFLY_VERSION /data/wildfly
 
 # Define WILDFLY_HOME environmental variable
-ENV WILDFLY_HOME /data/wildfly-$WILDFLY_VERSION
+ENV WILDFLY_HOME /data/wildfly
+
+# Add volumes as log folders
+VOLUME /data/wildfly/standalone/log
+VOLUME /data/wildfly/domain/log
 
 # Expose AJP port
 EXPOSE 8009
